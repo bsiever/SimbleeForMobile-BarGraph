@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <SimbleeForMobile.h>
 #include "BarGraph.h"
 
 // A SimbleeForMobile scrolling bar graph. 

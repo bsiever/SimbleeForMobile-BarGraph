@@ -7,6 +7,7 @@
  *
  * This module is specifically for a scrolling bar graph.
  */
+#include<SimbleeForMobile.h>
 
 class BarGraph {
   static const int MAX_BARS = 30;
