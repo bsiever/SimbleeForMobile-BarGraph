@@ -7,10 +7,19 @@
  *
  * This module is specifically for a scrolling bar graph.
  */
+
+#ifndef SimbleeForMobile_BarGraph_h
+#define SimbleeForMobile_BarGraph_h
+
+#include "Arduino.h"
+
+#if !defined(_VARIANT_SIMBLEE_)
+#error "BarGraph.h is only for use with Simblee-based boards"
+#endif
+
 #include<SimbleeForMobile.h>
 
 class BarGraph {
-  static const int MAX_BARS = 30;
   static const int LABEL_WIDTH = 20;
 
 public:
@@ -43,7 +52,8 @@ private:
   color_t barColor;
   
   unsigned maxValue;
-  unsigned data[MAX_BARS];
-  uint8_t barIds[MAX_BARS]; 
+  unsigned *data;
+  uint8_t *barIds; 
 };
 
+#endif

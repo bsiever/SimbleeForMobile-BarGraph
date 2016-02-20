@@ -7,7 +7,10 @@
 
 BarGraph::BarGraph(int bars, unsigned maxValue, color_t backgroundColor, color_t barColor): 
    x(0), y(0), width(0), height(0), bars(bars), 
-   currentBars(0), maxValue(maxValue), barColor(barColor), backgroundColor(backgroundColor) { }
+   currentBars(0), maxValue(maxValue), barColor(barColor), backgroundColor(backgroundColor) { 
+   barIds = (uint8_t* )malloc(bars*sizeof(uint8_t));
+   data = (unsigned *)malloc(bars*sizeof(unsigned));
+}
 
 void BarGraph::resetData() {
   firstBar = lastBar = currentBars = 0;
