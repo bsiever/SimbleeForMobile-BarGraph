@@ -1,2 +1,2 @@
-# Simblee-PulseSensorAmped
-Simblee (and RFduino) library for Pulse Sensor (http://pulsesensor.com/)
+# SimbleeForMobile-BarGraph
+SimbleeForMobile library for a simple scrolling BarGraph.

@@ -1,18 +1,14 @@
-#include<Arduino.h>
+#include <Arduino.h>
 #include <SimbleeForMobile.h>
 #include "BarGraph.h"
 
-// A SimbleeForMobile scrolling bar graph. The location and size are configured when it appears. The number of bars and maxValue is specified when declared.
+// A SimbleeForMobile scrolling bar graph. 
+// The location and size are configured when it appears. 
+// The number of bars, maxValue, and colors are specified when declared.
 
-BarGraph::BarGraph(int bars, unsigned maxValue): x(0), y(0), width(0), height(0), bars(bars), currentBars(0), barColor(BLUE), backgroundColor(RED), maxValue(maxValue) { }
-
-void BarGraph::setBarColor(color_t newColor) {
-  barColor = newColor;
-}
-
-void BarGraph::setBackgroundColor(color_t newColor) {
-  backgroundColor = newColor;
-}
+BarGraph::BarGraph(int bars, unsigned maxValue, color_t backgroundColor, color_t barColor): 
+   x(0), y(0), width(0), height(0), bars(bars), 
+   currentBars(0), maxValue(maxValue), barColor(barColor), backgroundColor(backgroundColor) { }
 
 void BarGraph::resetData() {
   firstBar = lastBar = currentBars = 0;
@@ -56,9 +52,9 @@ void BarGraph::createBars() {
   // Divide space not used by labels and pixels between bars among bars
   unsigned barWidth = (width - LABEL_WIDTH - bars)/bars;
   for(int i=0;i<bars;i++) {
-        unsigned start = x+LABEL_WIDTH+i*(barWidth+1);
-        unsigned value = 0; // Updates to y & height
-        barIds[i] = SimbleeForMobile.drawRect(start, y+height-value, barWidth, value, barColor); 
+    unsigned start = x+LABEL_WIDTH+i*(barWidth+1);
+    unsigned value = 1; 
+    barIds[i] = SimbleeForMobile.drawRect(start, y+height-value, barWidth, value, barColor); 
   }
 }
 
@@ -70,7 +66,7 @@ void BarGraph::updateUI() {
   // For Each available bar.  
   int index = firstBar;  
   for(int i=0;i<currentBars;i++) {
-    unsigned newH = (data[index]*height)/maxValue;
+    unsigned newH = max(1,(data[index]*height)/maxValue);
     unsigned newY = y+(height-newH);
     SimbleeForMobile.updateY(barIds[i], newY);
     SimbleeForMobile.updateH(barIds[i], newH);

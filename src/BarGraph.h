@@ -14,11 +14,8 @@ class BarGraph {
 
 public:
   // Construct a BarGraph object
-  BarGraph(int bars, unsigned maxValue);
+  BarGraph(int bars, unsigned maxValue, color_t backgroundColor=WHITE, color_t barColor=BLUE);
 
-  // Set Background & Foreground.  Must be set before creatUI
-  void setBarColor(color_t newColor);
-  void setBackgroundColor(color_t newColor);
 
   // Reset the data  
   void resetData();
