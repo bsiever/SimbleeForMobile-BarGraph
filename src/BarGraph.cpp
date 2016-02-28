@@ -4,18 +4,11 @@
 // A SimbleeForMobile scrolling bar graph. 
 // The location and size are configured when it appears. 
 // The number of bars, maxValue, and colors are specified when declared.
-
-
+ 
 /*
-    EXERCISE
-    
-    This library uses an inefficient scroll update method: the bars are at
-    fixed locations on the screen and every update causes the width and height
-    of each to update.  A better approach would be to adjust just the x 
-    coordinate of all the bars that need to "move left" on a scroll and 
-    update the width, height, and x coordinate of the leftmost bar to become
-    the new rightmost bar. 
-*/
+ Scrolling behavior requires updating several X coordinates
+ (More bars will lower performance)
+ */
 
 BarGraph::BarGraph(int bars, unsigned maxValue, color_t backgroundColor, color_t barColor): 
    x(0), y(0), width(0), height(0), bars(bars), 
@@ -77,14 +70,28 @@ void BarGraph::updateUI() {
   if(SimbleeForMobile.updatable == false)
     return;
 
-  // For Each available bar.  
-  int index = firstBar;  
-  for(int i=0;i<currentBars;i++) {
-    unsigned newH = max(1,(data[index]*height)/maxValue);
-    unsigned newY = y+(height-newH);
-    SimbleeForMobile.updateY(barIds[i], newY);
-    SimbleeForMobile.updateH(barIds[i], newH);
-    index = (index+1)%bars;
+  int index;  // Start at the last added bar 
+  unsigned newX;
+  unsigned barWidth = (width - LABEL_WIDTH - bars)/bars;
+
+  // if it's time to scroll
+  if(currentBars == bars) {
+    index = (lastBar+1) % bars; // Start at the first bar
+    for(int i=0;i<bars-1;i++) {
+      unsigned start = x+LABEL_WIDTH+i*(barWidth+1);
+      SimbleeForMobile.updateX(barIds[index],start);
+      index = (index+1)%bars;
+    }    
+    newX = x+LABEL_WIDTH+(bars-1)*(barWidth+1);    
+  } else {
+    index = currentBars-1;
+    newX = x+LABEL_WIDTH+index*(barWidth+1);
   }
+  // Update the last bar added
+  unsigned newH = max(1,(data[index]*height)/maxValue);
+  unsigned newY = y+(height-newH);
+  SimbleeForMobile.updateY(barIds[index], newY);
+  SimbleeForMobile.updateX(barIds[index], newX);
+  SimbleeForMobile.updateH(barIds[index], newH);
 }
 
