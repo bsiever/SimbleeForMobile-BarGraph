@@ -13,13 +13,14 @@ BarGraph testBarGraph(4,30);
 uint8_t addDataId;
 uint8_t valueAddedId;
 
+
 void setup() { 
   Serial.begin(9600);
   Serial.println("Starting");
   SimbleeForMobile.deviceName = "BG Tests";
   SimbleeForMobile.advertisementData = "BG";
   SimbleeForMobile.domain = "siever.info";
- 
+
   // Begin Simble UI
   SimbleeForMobile.begin();
 }
@@ -31,6 +32,10 @@ void loop() {
 
 void SimbleeForMobile_onConnect()
 {
+  // BG: Optional: do a resetData() on either disconnect or connect if 
+  //     data should not be persistent across connections.
+  //    (Persistent data doesn't redraw correctly with current version of Simblee)
+  testBarGraph.resetData();
 }
 
 
@@ -49,33 +54,30 @@ void ui()
   int width = SimbleeForMobile.screenWidth;
   int height = SimbleeForMobile.screenHeight;
 
-  addDataId = SimbleeForMobile.drawButton(0, height/3, width, "Add Random Data", BLUE, TEXT_TYPE);
-  SimbleeForMobile.setEvents(addDataId, EVENT_PRESS);
-
   valueAddedId = SimbleeForMobile.drawButton(0, height/3+40, width, "(None)", BLACK, TEXT_TYPE);
+
+  addDataId = SimbleeForMobile.drawButton(0, height/3-40, width, "Add Random Data", BLUE, TEXT_TYPE);
+  SimbleeForMobile.setEvents(addDataId, EVENT_PRESS);
 
   // BG: Add the BarGraph to the UI. 
   // Arguments are: x,y,width,height
   testBarGraph.createUI(0,height-height/3,width, height/3);
   
   SimbleeForMobile.endScreen();
-
-  // BG: If a persistent BarGraph is desired do an "updateUI()" here
-  testBarGraph.updateUI();
-  // otherwise do a resetData():
-  //testBarGraph.resetData();
 }
 
 
 void ui_event(event_t &event)
 {
-  // Generate random data to append to the graph
-  char buffer[5];
-  // The only event possible should be the button
-  unsigned newValue = random(0,30);
-  sprintf(buffer, "%d", newValue);
-  SimbleeForMobile.updateText(valueAddedId, buffer);
+  if(event.id == addDataId) {
+    // Generate random data to append to the graph
+    char buffer[5];
+    // The only event possible should be the button
+    unsigned newValue = random(0,30);
+    sprintf(buffer, "%d", newValue);
+    SimbleeForMobile.updateText(valueAddedId, buffer);
 
-  // BG: This is an example of how a new piece of data is added to the BarGraph.
-  testBarGraph.appendData(newValue);
+    // BG: This is an example of how a new piece of data is added to the BarGraph.
+    testBarGraph.appendData(newValue);
+  }
 }

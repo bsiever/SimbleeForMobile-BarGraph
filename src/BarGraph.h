@@ -34,8 +34,11 @@ public:
 
   void createUI(unsigned x, unsigned y, unsigned width, unsigned height);
 
-  void updateUI();
-
+  void updateUI();  // Update changes
+ 
+// BSIEVER: Tested refreshUI() to redraw persistent data.  
+//  void refreshUI(); // Refresh all bars
+  
 private:
   void createBars();
 

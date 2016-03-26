@@ -9,7 +9,7 @@
  Scrolling behavior requires updating several X coordinates
  (More bars will lower performance)
  */
-
+ 
 BarGraph::BarGraph(int bars, unsigned maxValue, color_t backgroundColor, color_t barColor): 
    x(0), y(0), width(0), height(0), bars(bars), 
    currentBars(0), maxValue(maxValue), barColor(barColor), backgroundColor(backgroundColor) { 
@@ -44,6 +44,7 @@ void BarGraph::createUI(unsigned x, unsigned y, unsigned width, unsigned height)
   // Draw background
   SimbleeForMobile.drawRect(x,y,width,height,backgroundColor);
   // Place Labels
+  // Max Value Label
   id = SimbleeForMobile.drawText(x, y, maxValue);
   SimbleeForMobile.updateColor(id, barColor);
   // Label for min value (0)
@@ -51,28 +52,62 @@ void BarGraph::createUI(unsigned x, unsigned y, unsigned width, unsigned height)
   SimbleeForMobile.updateColor(id, barColor);
   // Create Bars
   createBars();
-  updateUI();
 }
 
 
 void BarGraph::createBars() {
   // Divide space not used by labels and pixels between bars among bars
-  unsigned barWidth = (width - LABEL_WIDTH - bars)/bars;
+  uint16_t barWidth = (width - LABEL_WIDTH - bars)/bars;
+  uint16_t start;
+  uint16_t h;
+  unsigned barIndex;   
   for(int i=0;i<bars;i++) {
-    unsigned start = x+LABEL_WIDTH+i*(barWidth+1);
-    unsigned value = 1; 
-    barIds[i] = SimbleeForMobile.drawRect(start, y+height-value, barWidth, value, barColor); 
+    start = x+LABEL_WIDTH+i*(barWidth+1);
+    barIndex = (firstBar+i)%bars;
+    if(i < currentBars) {      
+      h = max(1,(data[barIndex]*height)/maxValue);
+    } else {
+      h = 1;
+    }
+    uint16_t yCoord = y+(height-h);
+    barIds[i] = SimbleeForMobile.drawRect(start, yCoord, barWidth, h, barColor); 
+//printf("Connect: (%d,%d) x %d\n", start, yCoord, h);
   }
 }
 
+
+/*
+// BSIEVER: Test code for redrawing persistent data.
+void BarGraph::refreshUI() {
+  if(SimbleeForMobile.updatable == false)
+    return;
+
+  uint16_t barWidth = (width - LABEL_WIDTH - bars)/bars;
+
+  for(int i=0;i<bars;i++) {
+      unsigned index = (i+firstBar)%bars;
+
+      uint16_t newX = x+LABEL_WIDTH+i*(barWidth+1);
+      uint16_t newH;
+      if(i<currentBars) 
+        newH = max(1,(data[index]*height)/maxValue);
+      else 
+        newH = 1;
+      uint16_t newY = y+(height-newH);
+
+//printf("Refresh: (%d,%d) x %d\n", newX, newY, newH);
+      SimbleeForMobile.updateRect(barIds[index], newX, newY, barWidth, newH);
+  }
+}
+*/
 
 void BarGraph::updateUI() {
   if(SimbleeForMobile.updatable == false)
     return;
 
   int index;  // Start at the last added bar 
-  unsigned newX;
-  unsigned barWidth = (width - LABEL_WIDTH - bars)/bars;
+  uint16_t newX;
+  uint16_t barWidth = (width - LABEL_WIDTH - bars)/bars;
 
   // if it's time to scroll
   if(currentBars == bars) {
@@ -88,10 +123,10 @@ void BarGraph::updateUI() {
     newX = x+LABEL_WIDTH+index*(barWidth+1);
   }
   // Update the last bar added
-  unsigned newH = max(1,(data[index]*height)/maxValue);
-  unsigned newY = y+(height-newH);
-  SimbleeForMobile.updateY(barIds[index], newY);
-  SimbleeForMobile.updateX(barIds[index], newX);
+  uint16_t newH = max(1,(data[index]*height)/maxValue);
+  uint16_t newY = y+(height-newH);
+  SimbleeForMobile.updateOrigin(barIds[index], newX, newY);
   SimbleeForMobile.updateH(barIds[index], newH);
+//printf("Latest: (%d,%d) x %d\n", newX, newY, newH);
 }
 
